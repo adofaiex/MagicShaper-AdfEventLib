@@ -83,10 +83,10 @@ namespace MagicShaper.AdfExtensions
 					}
 				}
 
-				prevX += length * Math.Cos(chart.ChartTiles[startTile + i - 1].TargetAngle / 180 * Math.PI);
-				prevY += length * Math.Sin(chart.ChartTiles[startTile + i - 1].TargetAngle / 180 * Math.PI);
+                prevX += length * Math.Cos((p + 180) / 180 * Math.PI);
+                prevY += length * Math.Sin((p + 180) / 180 * Math.PI);
 
-				AdfTrackIcon icon = AdfTrackIcon.None;
+                AdfTrackIcon icon = AdfTrackIcon.None;
 				bool isRedTwirl = false;
 				if (!hideIcons)
 				{
@@ -126,8 +126,9 @@ namespace MagicShaper.AdfExtensions
 					ObjectType = AdfObjectType.Floor,
 					RelativeTo = AdfMoveDecorationRelativeToType.Tile,
 					Floor = startTile,
-					Rotation = rotation + chart.GetInnerAngleAtTile(startTile + i) + 180d,
-					TrackAngle = chart.GetInnerAngleAtTile(startTile + i),
+                    Rotation = chart.ChartTiles[startTile + i].TargetAngle > 360d ? (p + 180) : (rotation + chart.GetInnerAngleAtTile(startTile + i) + 180d),
+                    TrackAngle = chart.GetInnerAngleAtTile(startTile + i),
+                    TrackType = chart.ChartTiles[startTile + i].TargetAngle > 360d ? AdfTrackType.Midspin : AdfTrackType.Normal,
 					Parallax = new(parallaxX, parallaxY),
 					ParallaxOffset = new(prevX, prevY),
 					TrackOpacity = 0,
