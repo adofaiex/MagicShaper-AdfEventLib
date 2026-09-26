@@ -29,7 +29,7 @@ namespace MagicShaper.AdofaiCore.AdfEvents
 
 		public AdfTrackStyle TrackStyle { get; set; } = AdfTrackStyle.Standard;
 
-		public double TrackGlowIntensity { get; set; } = 100d;
+		public double? TrackGlowIntensity { get; set; } = null;
 
 
 		public string TrackTexture { get; set; } = "";

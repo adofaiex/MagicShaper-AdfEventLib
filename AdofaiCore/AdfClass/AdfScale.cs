@@ -65,5 +65,5 @@ namespace MagicShaper.AdofaiCore.AdfClass
 				writer.WriteEndArray();
 			}
 		}
-	}
+    }
 }
