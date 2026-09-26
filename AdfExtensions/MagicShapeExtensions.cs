@@ -77,6 +77,10 @@ namespace MagicShaper.AdfExtensions
         {
 			double alpha = chart.ChartTiles[tile - 1].TargetAngle;
 			double beta = chart.ChartTiles[tile].TargetAngle;
+			if (alpha > 360d && tile > 1)  // Fuck midspins
+			{
+				alpha = chart.ChartTiles[tile - 2].TargetAngle + 180d;
+			}
 
 			double realAngle = 180d - alpha + beta;
 			if (realAngle > 360d)
