@@ -12,7 +12,7 @@ internal class Program
 {
 	private static void Main()
 	{
-		AdfVfxProj_ValentineChinco.ProjMain();
+		AdfVfxProj_LarpingTheRooms.ProjMain();
 
 	}
 

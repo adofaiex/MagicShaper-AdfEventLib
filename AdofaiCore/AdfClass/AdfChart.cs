@@ -192,6 +192,11 @@ namespace MagicShaper.AdofaiCore.AdfClass
 			option.Converters.Add(new AdfConverter<AdfTrackIcon>());
             option.Converters.Add(new AdfConverter<AdfAngleCorrectionDirection>());
 
+            option.Converters.Add(new AdfConverter<AdfHoldMidSoundTimingRelativeToType>());
+            option.Converters.Add(new AdfConverter<AdfHoldMidSoundType>());
+            option.Converters.Add(new AdfConverter<AdfHoldSoundType>());
+            option.Converters.Add(new AdfConverter<AdfPlanetsType>());
+
 			option.Converters.Add(new AdfPosition.AdfPositionConverter());
 			option.Converters.Add(new AdfTileReference.AdfTileReferenceConverter());
 			option.Converters.Add(new AdfColor.AdfColorConverter());
@@ -243,6 +248,8 @@ namespace MagicShaper.AdofaiCore.AdfClass
                 new AdfEventHold(),
                 new AdfEventScaleRadius(),
                 new AdfEventScaleMargin(),
+                new AdfEventSetHoldSound(),
+                new AdfEventMultiPlanet(),
             };
 
 			foreach (var e in events)
