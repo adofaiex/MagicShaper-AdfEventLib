@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Net.WebSockets;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Threading.Tasks;
 using MagicShaper.AdfExtensions;
@@ -9,15 +12,17 @@ using MagicShaper.AdfExtensions.Gimmicks;
 using MagicShaper.AdofaiCore.AdfClass;
 using MagicShaper.AdofaiCore.AdfEvents;
 using MagicShaper.AdofaiCore.AdfEvents.Dlc;
+using MagicShaper.AdofaiCore.DerivedClass;
 using OpenCvSharp;
 
 namespace MagicShaper.VfxProjects
 {
+    [SupportedOSPlatform("windows")]
     public class AdfVfxProj_LarpingTheRooms
     {
         public static void ProjMain()
         {
-			AdfChart chart = AdfChart.Parse(@"G:\Adofai levels\larping\level-base.adofai");
+            AdfChart chart = AdfChart.Parse(@"G:\Adofai levels\larping\level-base.adofai");
 
             PrepareFlashes(chart);
 
@@ -31,13 +36,39 @@ namespace MagicShaper.VfxProjects
             ManyTenKeys(chart);
 
             Chorus(chart, 538, 593);
-			TrackSpiralPart(chart);
+            TrackSpiralPart(chart);
             ScreenshotFlashes(chart, 722, 765, 0.98, 8);
 
 
 
 
+            //{
+            //    var lyrics = File.ReadAllText(@"G:\Adofai levels\larping\_lyrics.txt");
+            //    HashSet<char> possibleCharacters = [];
+            //    foreach (var it in lyrics)
+            //    {
+            //        if (it == ' ' || it == '\n' || it == '\r' || it == '\t') continue;
+            //        possibleCharacters.Add(it);
+            //    }
+            //    foreach (var it in possibleCharacters) RenderCharacter(chart, it);
+            //}
 
+            DarkRoomLyrics(chart);
+            HallwayLyrics(chart);
+            ChorusLyrics(chart, 221);
+            LongFallLyrics(chart);
+            ManyTenKeysLyrics(chart);
+            ChorusLyrics(chart, 538);
+            TrackSpiralLyrics(chart);
+
+
+
+            chart.RenderCreditRoleAndName(838, "Track", "SSSeanLB", -ExtensionSharedConstants.TileWidth * 5, ExtensionSharedConstants.TileWidth * 6, 0, 4, 64, 100);
+            chart.RenderCreditRoleAndName(838, "Visuals", "quartrond", -ExtensionSharedConstants.TileWidth * 5, (int)(ExtensionSharedConstants.TileWidth * 3.5), 0, 4, 64, 100);
+            chart.RenderCreditRoleAndName(838, "Library", "MagicShaper-AdfEventLib", -ExtensionSharedConstants.TileWidth * 5, ExtensionSharedConstants.TileWidth * -6, 0, 4, 64, 100);
+
+            chart.RenderCreditRoleAndName(838, "Artist", "The Larping Tombstone", ExtensionSharedConstants.TileWidth * 5, ExtensionSharedConstants.TileWidth * 6, 0, 4, 64, 100);
+            chart.RenderCreditRoleAndName(838, "Song", "\"Looping the Rooms (Larping the Rooms)\" (Remix)", ExtensionSharedConstants.TileWidth * 5, (int)(ExtensionSharedConstants.TileWidth * 3.5), 0, 4, 64, 100);
 
 
 
@@ -57,13 +88,484 @@ namespace MagicShaper.VfxProjects
 
 
 
+
+        private static void TrackSpiralLyrics(AdfChart chart)
+        {
+            List<Tuple<int, string>> lyrics = [new(594, "ああ、扉を開け"), new(617, "意味も忘れ"), new(633, "いかれた夢の奥へ"), new(662, "どこまでも続いてく"), new(706, "")];
+
+            for (int l = 0; l < lyrics.Count - 1; l++)
+            {
+                var lyric = lyrics[l];
+                var floor = lyric.Item1; var text = lyric.Item2;
+
+                for (int i = 0; i < text.Length; i++)
+                {
+                    var it = text[i]; var byteString = $"{Convert.ToUInt16(it):X2}";
+                    chart.AddDecorationToChart(new AdfDecoration()
+                    {
+                        Floor = floor,
+                        RelativeTo = AdfMoveDecorationRelativeToType.Camera,
+                        DecorationImage = $"quartrond_lyric_{byteString}.png",
+                        Tag = $"quartrond-spiral-{floor}-{i}",
+                        Color = new("000000FF"),
+                        ImageSmoothing = false,
+                        Locked = true,
+                        LockScale = true,
+                        Scale = new(45),
+                        Position = new((-((text.Length - 1) / 2d) + i) * 0.9d, 0d),
+                        Opacity = 0,
+                        Depth = -1,
+                    });
+                    chart.ChartTiles[floor].TileEvents.Add(new AdfEventMoveDecorations()
+                    {
+                        Tag = $"quartrond-spiral-{floor}-{i}",
+                        RelativeTo = AdfMoveDecorationRelativeToType.LastPosition,
+                        PositionOffset = new(-(-((text.Length - 1) / 2d) + i) * 0.2d, null),
+                        Scale = new(55),
+                        Duration = 9d,
+                        Ease = AdfEaseType.OutCirc,
+                    });
+                    chart.ChartTiles[floor].TileEvents.Add(new AdfEventMoveDecorations()
+                    {
+                        Tag = $"quartrond-spiral-{floor}-{i}",
+                        Opacity = 100,
+                        Duration = 6d,
+                        Ease = AdfEaseType.OutSine,
+                    });
+
+                    chart.ChartTiles[lyrics[l + 1].Item1].TileEvents.Add(new AdfEventMoveDecorations()
+                    {
+                        Tag = $"quartrond-spiral-{floor}-{i}",
+                        RelativeTo = AdfMoveDecorationRelativeToType.LastPosition,
+                        PositionOffset = new(-(-((text.Length - 1) / 2d) + i) * 0.2d, null),
+                        Scale = new(35),
+                        Opacity = 0,
+                        Duration = 6d,
+                        Ease = AdfEaseType.OutCirc,
+                    });
+                }
+            }
+        }
+
+        private static void ManyTenKeysLyrics(AdfChart chart)
+        {
+            List<Tuple<int, string>> lyrics = [new(331, "落ちてた柘榴で飢えを凌いだ"), new(378, "頭蓋の中から耳鳴りがした"), new(434, "進めど進めど変わりないなら"), new(490, "抗う意味など"),];
+
+            var random = new Random();
+            foreach (var lyric in lyrics)
+            {
+                var floor = lyric.Item1; var text = lyric.Item2;
+                for (int i = 0; i < text.Length; i++)
+                {
+                    var it = text[i]; var byteString = $"{Convert.ToUInt16(it):X2}";
+                    var rotationOffset = random.RandBetween(-135, 135);
+                    chart.AddDecorationToChart(new AdfDecoration()  // main
+                    {
+                        Floor = floor,
+                        RelativeTo = AdfMoveDecorationRelativeToType.Camera,
+                        DecorationImage = $"quartrond_lyric_{byteString}.png",
+                        Tag = $"quartrond-char-{floor}-{i} quartrond-char-manytenkeys",
+                        BlendMode = AdfBlendMode.Screen,
+                        ImageSmoothing = false,
+                        Locked = true,
+                        Scale = new(100),
+                        Position = new(-6d + ((-((text.Length - 1) / 2d) + i) * 0.6d), 0d),
+                        PivotOffset = new(0, -0.3d),
+                        Rotation = rotationOffset,
+                        Opacity = 0,
+                        Depth = -1,
+                    });
+
+                    chart.ChartTiles[floor].TileEvents.Add(new AdfEventMoveDecorations()
+                    {
+                        Tag = $"quartrond-char-{floor}-{i}",
+                        Duration = random.RandBetween(4, 6) * 64,
+                        Opacity = 100,
+                        PositionOffset = new(4d, null),
+                        Ease = AdfEaseType.OutBack,
+                        AngleOffset = 15 * i * 64,
+                    });
+                    chart.ChartTiles[floor].TileEvents.Add(new AdfEventMoveDecorations()
+                    {
+                        Tag = $"quartrond-char-{floor}-{i}",
+                        Duration = random.RandBetween(14, 18) * 64,
+                        RotationOffset = -rotationOffset,
+                        Ease = AdfEaseType.OutElastic,
+                        AngleOffset = 15 * i * 64,
+                    });
+                    chart.ChartTiles[floor].TileEvents.Add(new AdfEventMoveDecorations()
+                    {
+                        Tag = $"quartrond-char-{floor}-{i}",
+                        Duration = random.RandBetween(9, 13) * 64,
+                        Opacity = 0,
+                        PositionOffset = new(random.RandBetween(8, 13), random.RandBetween(-3, 3)),
+                        Ease = AdfEaseType.OutCirc,
+                        AngleOffset = 2400 * 64,
+                    });
+                }
+            }
+            chart.ChartTiles[513].TileEvents.Add(new AdfEventMoveDecorations()
+            {
+                Tag = $"quartrond-char-manytenkeys",
+                Duration = 0,
+                Opacity = 0,
+            });
+        }
+
+
+        private static void LongFallLyrics(AdfChart chart)
+        {
+            List<Tuple<int, string>> lyrics = [new(0, "空回るソウト"), new(180, "終わらないロード"), new(360, "鉄臭い酸素"), new(540, "届かないSOS")];
+
+            var random = new Random();
+            foreach (var lyric in lyrics)
+            {
+                var floor = 328; var text = lyric.Item2; var angleOffsetOffset = lyric.Item1;
+                var textAlignmentOffset = -(text.Length / 2d * 0.8d);
+                for (int i = 0; i < text.Length; i++)
+                {
+                    var it = text[i]; var byteString = $"{Convert.ToUInt16(it):X2}";
+                    var offsetRotation = random.RandBetween(30, 60);
+                    chart.AddDecorationToChart(new AdfDecoration()  // main
+                    {
+                        Floor = floor,
+                        RelativeTo = AdfMoveDecorationRelativeToType.Tile,
+                        DecorationImage = $"quartrond_lyric_{byteString}.png",
+                        Tag = $"quartrond-char-longfall-{angleOffsetOffset}-{i}",
+                        BlendMode = AdfBlendMode.Screen,
+                        ImageSmoothing = false,
+                        Locked = true,
+                        Scale = new(0),
+                        Rotation = offsetRotation,
+                        Position = new((i * 0.8d) + textAlignmentOffset, (angleOffsetOffset * (-0.05d)) - 5.5d),
+                        PivotOffset = new(0, 0.3d),
+                        Opacity = 0,
+                        Depth = 2,
+                    });
+                    chart.AddDecorationToChart(new AdfDecoration()  // shadow
+                    {
+                        Floor = floor,
+                        RelativeTo = AdfMoveDecorationRelativeToType.Tile,
+                        DecorationImage = $"quartrond_lyric_{byteString}.png",
+                        Tag = $"quartrond-char-longfall-{angleOffsetOffset}-{i}",
+                        BlendMode = AdfBlendMode.Screen,
+                        ImageSmoothing = false,
+                        Locked = true,
+                        Scale = new(0),
+                        Rotation = offsetRotation,
+                        Position = new((i * 0.8d) + textAlignmentOffset, (angleOffsetOffset * (-0.05d)) - 5.5d),
+                        PivotOffset = new(0.05d, 0.25d),
+                        Color = new("8F7921FF"),
+                        Opacity = 0,
+                        Depth = 3,
+                    });
+
+                    chart.ChartTiles[floor].TileEvents.Add(new AdfEventMoveDecorations()
+                    {
+                        Tag = $"quartrond-char-longfall-{angleOffsetOffset}-{i}",
+                        Opacity = 100,
+                        RotationOffset = -offsetRotation,
+                        Scale = new(55),
+                        Duration = random.RandBetween(0.25, 0.5),
+                        Ease = AdfEaseType.OutBack,
+                        AngleOffset = (4 * i) + angleOffsetOffset,
+                    });
+                    chart.ChartTiles[floor].TileEvents.Add(new AdfEventMoveDecorations()
+                    {
+                        Tag = $"quartrond-char-longfall-{angleOffsetOffset}-{i}",
+                        Opacity = 0,
+                        RotationOffset = offsetRotation,
+                        Scale = new(0),
+                        Duration = random.RandBetween(0.25, 0.5),
+                        Ease = AdfEaseType.InBack,
+                        AngleOffset = 160 + random.RandBetween(-10, 10) + angleOffsetOffset,
+                    });
+                }
+            }
+        }
+        private static void ChorusLyrics(AdfChart chart, int tile)
+        {
+            List<int> characterCounts = [8, 23, 8, 23];
+            string lyrics = "くるくるくるくる1くりかえす2くりかえす2くりかえす2くりかえす1ふらふらふらふら1ふらくたる2ふらくたる2ふらくたる2ふらくたる";
+            var characterPointer = 0; var characterCountPointer = 0;
+            var characterXPosition = (characterCounts[characterCountPointer] - 1) / 2d * (-0.4d);
+            var random = new Random();
+
+            for (int i = tile; i < tile + 56; i++)
+            {
+                if (lyrics[characterPointer] == '1')
+                {
+                    // Annihilate previous lyrics
+                    for (int j = 0; j < characterCounts[characterCountPointer]; j++)
+                    {
+                        var disappearAngleOffset = random.RandBetween(0, 60);
+                        chart.ChartTiles[i].TileEvents.Add(new AdfEventMoveDecorations()
+                        {
+                            Tag = $"quartrond-char-chorus1-{i - j - 1}",
+                            PositionOffset = new(null, random.RandBetween(-10, -5)),
+                            AngleOffset = disappearAngleOffset,
+                            RotationOffset = random.RandBetween(-45, 45),
+                            Duration = random.RandBetween(1, 2),
+                            Scale = new(10),
+                            Ease = AdfEaseType.InQuad,
+                        });
+                        chart.ChartTiles[i].TileEvents.Add(new AdfEventMoveDecorations()
+                        {
+                            Tag = $"quartrond-char-chorus1-{i - j - 1}",
+                            PositionOffset = new(random.RandBetween(-3, 3), null),
+                            AngleOffset = disappearAngleOffset,
+                            Duration = random.RandBetween(1, 2),
+                            Ease = AdfEaseType.Linear,
+                        });
+                    }
+                    chart.ChartTiles[i].TileEvents.Add(new AdfEventMoveDecorations()
+                    {
+                        Tag = $"quartrond-char-chorus1-group-{characterCountPointer}",
+                        Opacity = 0,
+                        Duration = 3,
+                        Ease = AdfEaseType.OutSine,
+                    });
+
+                    characterCountPointer++;
+                    characterXPosition = (characterCounts[characterCountPointer] - 1) / 2d * (-0.4d);
+
+                    characterPointer++;
+                }
+
+                if (lyrics[characterPointer] == '2') { characterPointer++; characterXPosition += 0.4d; }  // empty space, make sure it takes one block.
+
+                var it = lyrics[characterPointer]; var byteString = $"{Convert.ToUInt16(it):X2}";
+                var rotationOffset = random.RandBetween(-30, 30);
+
+                chart.AddDecorationToChart(new AdfDecoration()
+                {
+                    Floor = i,
+                    RelativeTo = AdfMoveDecorationRelativeToType.Camera,
+                    DecorationImage = $"quartrond_lyric_{byteString}.png",
+                    Tag = $"quartrond-char-chorus1-{i} quartrond-char-chorus1-group-{characterCountPointer}",
+                    BlendMode = AdfBlendMode.Screen,
+                    ImageSmoothing = false,
+                    Locked = true,
+                    Scale = new(45),
+                    Position = new(characterXPosition, -8.5d),
+                    Rotation = rotationOffset,
+                    Opacity = 0,
+                    Depth = -114,
+                });
+                chart.ChartTiles[i].TileEvents.Add(new AdfEventMoveDecorations()
+                {
+                    Tag = $"quartrond-char-chorus1-{i}",
+                    Scale = new(30, 90),
+                    Duration = 0.33333d,
+                    Opacity = 100,
+                    Ease = AdfEaseType.InElastic,
+                    AngleOffset = -60,
+                });
+                chart.ChartTiles[i].TileEvents.Add(new AdfEventMoveDecorations()
+                {
+                    Tag = $"quartrond-char-chorus1-{i}",
+                    Scale = new(45),
+                    RotationOffset = -rotationOffset,
+                    Duration = 1d,
+                    Ease = AdfEaseType.OutElastic,
+                    AngleOffset = 0,
+                });
+
+
+
+                characterXPosition += 0.4d; characterPointer++;
+            }
+
+
+
+
+            // Annihilate previous lyrics
+            for (int j = 0; j < characterCounts[characterCountPointer]; j++)
+            {
+                var disappearAngleOffset = random.RandBetween(0, 60);
+                chart.ChartTiles[tile + 57].TileEvents.Add(new AdfEventMoveDecorations()
+                {
+                    Tag = $"quartrond-char-chorus1-{tile + 57 - j - 1}",
+                    PositionOffset = new(null, random.RandBetween(-10, -5)),
+                    AngleOffset = disappearAngleOffset,
+                    RotationOffset = random.RandBetween(-45, 45),
+                    Duration = random.RandBetween(1, 2),
+                    Scale = new(10),
+                    Ease = AdfEaseType.InQuad,
+                });
+                chart.ChartTiles[tile + 57].TileEvents.Add(new AdfEventMoveDecorations()
+                {
+                    Tag = $"quartrond-char-chorus1-{tile + 57 - j - 1}",
+                    PositionOffset = new(random.RandBetween(-3, 3), null),
+                    AngleOffset = disappearAngleOffset,
+                    Duration = random.RandBetween(1, 2),
+                    Ease = AdfEaseType.Linear,
+                });
+            }
+            chart.ChartTiles[tile + 57].TileEvents.Add(new AdfEventMoveDecorations()
+            {
+                Tag = $"quartrond-char-chorus1-group-{characterCountPointer}",
+                Opacity = 0,
+                Duration = 3,
+                Ease = AdfEaseType.OutSine,
+            });
+        }
+
+        private static void HallwayLyrics(AdfChart chart)
+        {
+            List<Tuple<int, string>> lyrics = [new(120, "ドアの先に僕の背中が見えた"), new(140, "振り向いた先に希望が見えた"), new(156, "地獄の果てなどどこにあるのか"), new(187, "出口はまだなの？"),];
+
+            var random = new Random();
+            foreach (var lyric in lyrics)
+            {
+                var floor = lyric.Item1; var text = lyric.Item2;
+                for (int i = 0; i < text.Length; i++)
+                {
+                    var it = text[i]; var byteString = $"{Convert.ToUInt16(it):X2}";
+                    var rotationOffset = random.RandBetween(-135, 135);
+                    chart.AddDecorationToChart(new AdfDecoration()  // main
+                    {
+                        Floor = floor,
+                        RelativeTo = AdfMoveDecorationRelativeToType.Camera,
+                        DecorationImage = $"quartrond_lyric_{byteString}.png",
+                        Tag = $"quartrond-char-{floor}-{i}",
+                        BlendMode = AdfBlendMode.Screen,
+                        ImageSmoothing = false,
+                        Locked = true,
+                        Scale = new(46),
+                        Position = new(-8d, -4d),
+                        PivotOffset = new(0, -0.3d),
+                        Rotation = rotationOffset,
+                        Opacity = 0,
+                        Depth = -1,
+                    });
+
+                    chart.ChartTiles[floor].TileEvents.Add(new AdfEventMoveDecorations()
+                    {
+                        Tag = $"quartrond-char-{floor}-{i}",
+                        Duration = random.RandBetween(9, 12),
+                        Opacity = 100,
+                        PositionOffset = new(3d + (i * 0.3d), null),
+                        Ease = AdfEaseType.OutBack,
+                        AngleOffset = 15 * i,
+                    });
+                    chart.ChartTiles[floor].TileEvents.Add(new AdfEventMoveDecorations()
+                    {
+                        Tag = $"quartrond-char-{floor}-{i}",
+                        Duration = random.RandBetween(14, 18),
+                        RotationOffset = -rotationOffset,
+                        Ease = AdfEaseType.OutElastic,
+                        AngleOffset = 15 * i,
+                    });
+                    chart.ChartTiles[floor].TileEvents.Add(new AdfEventMoveDecorations()
+                    {
+                        Tag = $"quartrond-char-{floor}-{i}",
+                        Duration = random.RandBetween(6, 8),
+                        Scale = new(25),
+                        PositionOffset = new(null, random.RandBetween(-10d, -6d)),
+                        Ease = AdfEaseType.InBack,
+                        AngleOffset = 2400 + random.RandBetween(-90, 90),
+                    });
+                    chart.ChartTiles[floor].TileEvents.Add(new AdfEventMoveDecorations()
+                    {
+                        Tag = $"quartrond-char-{floor}-{i}",
+                        Duration = random.RandBetween(9, 13),
+                        Opacity = 0,
+                        PositionOffset = new(random.RandBetween(5, 10), null),
+                        Ease = AdfEaseType.InSine,
+                        AngleOffset = 2400 + random.RandBetween(-90, 90),
+                    });
+                }
+            }
+        }
+        private static void DarkRoomLyrics(AdfChart chart)
+        {
+            List<Tuple<int, string>> lyrics = [new(77, "引き抜くカセット"), new(88, "押し込むリセット"), new(99, "迷い込む迷路"), new(110, "進めどもダルセーニョ"),];
+
+            var random = new Random();
+            foreach (var lyric in lyrics)
+            {
+                var floor = lyric.Item1; var text = lyric.Item2;
+                var textAlignmentOffset = -(text.Length / 2d * 0.8d) + (chart.ChartTiles[floor].TargetAngle == 0d ? -4 : 4);
+                for (int i = 0; i < text.Length; i++)
+                {
+                    var it = text[i]; var byteString = $"{Convert.ToUInt16(it):X2}";
+                    var offsetRotation = random.RandBetween(30, 60);
+                    chart.AddDecorationToChart(new AdfDecoration()  // main
+                    {
+                        Floor = floor,
+                        RelativeTo = AdfMoveDecorationRelativeToType.Tile,
+                        DecorationImage = $"quartrond_lyric_{byteString}.png",
+                        Tag = $"quartrond-char-{floor}-{i}",
+                        BlendMode = AdfBlendMode.Screen,
+                        ImageSmoothing = false,
+                        Locked = true,
+                        Scale = new(0),
+                        Rotation = offsetRotation,
+                        Position = new((i * 0.8d) + textAlignmentOffset, 1.5d),
+                        PivotOffset = new(0, 0.3d),
+                        Opacity = 0,
+                        Depth = 2,
+                    });
+                    chart.AddDecorationToChart(new AdfDecoration()  // shadow
+                    {
+                        Floor = floor,
+                        RelativeTo = AdfMoveDecorationRelativeToType.Tile,
+                        DecorationImage = $"quartrond_lyric_{byteString}.png",
+                        Tag = $"quartrond-char-{floor}-{i}",
+                        BlendMode = AdfBlendMode.Screen,
+                        ImageSmoothing = false,
+                        Locked = true,
+                        Scale = new(0),
+                        Rotation = offsetRotation,
+                        Position = new((i * 0.8d) + textAlignmentOffset, 1.5d),
+                        PivotOffset = new(0.05d, 0.25d),
+                        Color = new("8F7921FF"),
+                        Opacity = 0,
+                        Depth = 3,
+                    });
+
+                    chart.ChartTiles[floor].TileEvents.Add(new AdfEventMoveDecorations()
+                    {
+                        Tag = $"quartrond-char-{floor}-{i}",
+                        Opacity = 100,
+                        RotationOffset = -offsetRotation,
+                        Scale = new(55),
+                        Duration = random.RandBetween(3, 4),
+                        Ease = AdfEaseType.OutBack,
+                        AngleOffset = 30 * i,
+                    });
+                    chart.ChartTiles[floor].TileEvents.Add(new AdfEventMoveDecorations()
+                    {
+                        Tag = $"quartrond-char-{floor}-{i}",
+                        Opacity = 0,
+                        RotationOffset = offsetRotation,
+                        Scale = new(0),
+                        Duration = random.RandBetween(3, 4) * (floor == 110 ? 0.6 : 1),
+                        Ease = AdfEaseType.InBack,
+                        AngleOffset = 900 + random.RandBetween(-90, 90),
+                    });
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+        #region GENERIC_EFFECT
+
         private static void ManyTenKeys(AdfChart chart)
         {
             Mat mat = Cv2.ImRead(chart.FileLocation?.Parent?.FullName + $"\\flashlight.jpg");
             double defaultCameraZoom = 500;
 
-            double widthMultiplier = (double) ExtensionSharedConstants.CanvasWidth / mat.Width * defaultCameraZoom / 100d;
-            double heightMultiplier = (double) ExtensionSharedConstants.CanvasHeight / mat.Height  * defaultCameraZoom / 100d;
+            double widthMultiplier = (double)ExtensionSharedConstants.CanvasWidth / mat.Width * defaultCameraZoom / 100d;
+            double heightMultiplier = (double)ExtensionSharedConstants.CanvasHeight / mat.Height * defaultCameraZoom / 100d;
 
             double scale = 100d * Math.Max(widthMultiplier, heightMultiplier);
 
@@ -201,90 +703,90 @@ namespace MagicShaper.VfxProjects
 
         private static void LongFall(AdfChart chart)
         {
-			Random random = new();
+            Random random = new();
 
-			for (int i = 0; i < 48; i++)
-			{
-				chart.AddObjectToChart(new()
-				{
-					ObjectType = AdfObjectType.Floor,
-					Parallax = new(random.RandBetween(15, 30), random.RandBetween(-5, 5)),
-					Depth = (int)random.RandBetween(-5, 5),
-					Tag = $"quartrond-broken-tiles-{i}",
-					Scale = new(random.RandBetween(50, 130)),
-					Position = new(random.RandBetween(0, 15), random.RandBetween(-20, -10)),
+            for (int i = 0; i < 48; i++)
+            {
+                chart.AddObjectToChart(new()
+                {
+                    ObjectType = AdfObjectType.Floor,
+                    Parallax = new(random.RandBetween(15, 30), random.RandBetween(-5, 5)),
+                    Depth = (int)random.RandBetween(-5, 5),
+                    Tag = $"quartrond-broken-tiles-{i}",
+                    Scale = new(random.RandBetween(50, 130)),
+                    Position = new(random.RandBetween(0, 15), random.RandBetween(-20, -10)),
                     TrackOpacity = 0,
-					TrackStyle = AdfTrackStyle.Neon,
-					TrackColor = new("FFFFFFFF"),
-					RelativeTo = AdfMoveDecorationRelativeToType.Tile,
-					Floor = 328,
-					TrackAngle = 180,
-					Rotation = random.NextDouble() * 360d,
-				});
+                    TrackStyle = AdfTrackStyle.Neon,
+                    TrackColor = new("FFFFFFFF"),
+                    RelativeTo = AdfMoveDecorationRelativeToType.Tile,
+                    Floor = 328,
+                    TrackAngle = 180,
+                    Rotation = random.NextDouble() * 360d,
+                });
 
-				chart.ChartTiles[328].TileEvents.Add(new AdfEventMoveDecorations()
-				{
-					Tag = $"quartrond-broken-tiles-{i}",
-					Duration = 0d,
-					Opacity = random.RandBetween(50, 100),
-				});
-				chart.ChartTiles[328].TileEvents.Add(new AdfEventMoveDecorations()
-				{
-					Tag = $"quartrond-broken-tiles-{i}",
-					Duration = 4,
+                chart.ChartTiles[328].TileEvents.Add(new AdfEventMoveDecorations()
+                {
+                    Tag = $"quartrond-broken-tiles-{i}",
+                    Duration = 0d,
+                    Opacity = random.RandBetween(50, 100),
+                });
+                chart.ChartTiles[328].TileEvents.Add(new AdfEventMoveDecorations()
+                {
+                    Tag = $"quartrond-broken-tiles-{i}",
+                    Duration = 4,
                     PositionOffset = PositionFromPolar(random.RandBetween(0, 15), random.RandBetween(25, 45)),
                     Ease = AdfEaseType.OutQuint,
-				});
-				chart.ChartTiles[328].TileEvents.Add(new AdfEventMoveDecorations()
-				{
-					Tag = $"quartrond-broken-tiles-{i}",
-					Duration = 0d,
-					Opacity = 0d,
-					AngleOffset = 360,
-					Visible = false
-				});
-			}
-			for (int i = 48; i < 48 * 2; i++)
-			{
-				chart.AddObjectToChart(new()
-				{
-					ObjectType = AdfObjectType.Floor,
-					Parallax = new(random.RandBetween(15, 30), random.RandBetween(-5, 5)),
-					Depth = (int)random.RandBetween(-5, 5),
-					Tag = $"quartrond-broken-tiles-{i}",
-					Scale = new(random.RandBetween(50, 130)),
-					Position = new(random.RandBetween(-15, 0), random.RandBetween(-20, -10)),
+                });
+                chart.ChartTiles[328].TileEvents.Add(new AdfEventMoveDecorations()
+                {
+                    Tag = $"quartrond-broken-tiles-{i}",
+                    Duration = 0d,
+                    Opacity = 0d,
+                    AngleOffset = 360,
+                    Visible = false
+                });
+            }
+            for (int i = 48; i < 48 * 2; i++)
+            {
+                chart.AddObjectToChart(new()
+                {
+                    ObjectType = AdfObjectType.Floor,
+                    Parallax = new(random.RandBetween(15, 30), random.RandBetween(-5, 5)),
+                    Depth = (int)random.RandBetween(-5, 5),
+                    Tag = $"quartrond-broken-tiles-{i}",
+                    Scale = new(random.RandBetween(50, 130)),
+                    Position = new(random.RandBetween(-15, 0), random.RandBetween(-20, -10)),
                     TrackOpacity = 0,
-					TrackStyle = AdfTrackStyle.Neon,
-					TrackColor = new("FFFFFFFF"),
-					RelativeTo = AdfMoveDecorationRelativeToType.Tile,
-					Floor = 328,
-					TrackAngle = 180,
-					Rotation = random.NextDouble() * 360d,
-				});
+                    TrackStyle = AdfTrackStyle.Neon,
+                    TrackColor = new("FFFFFFFF"),
+                    RelativeTo = AdfMoveDecorationRelativeToType.Tile,
+                    Floor = 328,
+                    TrackAngle = 180,
+                    Rotation = random.NextDouble() * 360d,
+                });
 
-				chart.ChartTiles[328].TileEvents.Add(new AdfEventMoveDecorations()
-				{
-					Tag = $"quartrond-broken-tiles-{i}",
-					Duration = 0d,
-					Opacity = random.RandBetween(50, 100),
-				});
-				chart.ChartTiles[328].TileEvents.Add(new AdfEventMoveDecorations()
-				{
-					Tag = $"quartrond-broken-tiles-{i}",
-					Duration = 4,
+                chart.ChartTiles[328].TileEvents.Add(new AdfEventMoveDecorations()
+                {
+                    Tag = $"quartrond-broken-tiles-{i}",
+                    Duration = 0d,
+                    Opacity = random.RandBetween(50, 100),
+                });
+                chart.ChartTiles[328].TileEvents.Add(new AdfEventMoveDecorations()
+                {
+                    Tag = $"quartrond-broken-tiles-{i}",
+                    Duration = 4,
                     PositionOffset = PositionFromPolar(random.RandBetween(0, 15), random.RandBetween(135, 155)),
                     Ease = AdfEaseType.OutQuint,
-				});
-				chart.ChartTiles[328].TileEvents.Add(new AdfEventMoveDecorations()
-				{
-					Tag = $"quartrond-broken-tiles-{i}",
-					Duration = 0d,
-					Opacity = 0d,
-					AngleOffset = 360,
-					Visible = false
-				});
-			}
+                });
+                chart.ChartTiles[328].TileEvents.Add(new AdfEventMoveDecorations()
+                {
+                    Tag = $"quartrond-broken-tiles-{i}",
+                    Duration = 0d,
+                    Opacity = 0d,
+                    AngleOffset = 360,
+                    Visible = false
+                });
+            }
 
 
 
@@ -311,7 +813,7 @@ namespace MagicShaper.VfxProjects
                     Tag = $"quartrond-wave-{i}",
                     Scale = new(0),
                     RelativeTo = AdfMoveDecorationRelativeToType.Camera,
-                    LockScale = true, 
+                    LockScale = true,
                     Position = new(approximateXPosition, random.RandBetween(-8, 8)),
                 });
                 chart.ChartTiles[328].TileEvents.Add(new AdfEventMoveDecorations()
@@ -442,38 +944,38 @@ namespace MagicShaper.VfxProjects
                 Opacity = 0,
                 Duration = 0d,
             });
-			for (int i = 0; i < 24; i++)
-			{
+            for (int i = 0; i < 24; i++)
+            {
                 var gid = random.Next(1000000).ToString().PadLeft(6, '0');
-				chart.AddDecorationToChart(new()
-				{
-					DecorationImage = "circle.png",
-					Opacity = 0d,
-					Tag = $"quartrond-random-starting-${start}-circle quartrond-random-starting-${start}-circle-{gid}",
-					RelativeTo = AdfMoveDecorationRelativeToType.Tile,
-					Position = new(random.RandBetween(-18, 18), random.RandBetween(-8, 8)),
-					Floor = start + 16,
-					Depth = 5,
-					BlendMode = AdfBlendMode.Multiply,
-					Scale = new(0)
-				});
+                chart.AddDecorationToChart(new()
+                {
+                    DecorationImage = "circle.png",
+                    Opacity = 0d,
+                    Tag = $"quartrond-random-starting-${start}-circle quartrond-random-starting-${start}-circle-{gid}",
+                    RelativeTo = AdfMoveDecorationRelativeToType.Tile,
+                    Position = new(random.RandBetween(-18, 18), random.RandBetween(-8, 8)),
+                    Floor = start + 16,
+                    Depth = 5,
+                    BlendMode = AdfBlendMode.Multiply,
+                    Scale = new(0)
+                });
 
-				chart.ChartTiles[start + 28].TileEvents.Add(new AdfEventMoveDecorations()
-				{
-					Duration = 0d,
-					Opacity = 100d,
-					Tag = $"quartrond-random-starting-${start}-circle-{gid}"
-				});
-				chart.ChartTiles[start + 28].TileEvents.Add(new AdfEventMoveDecorations()
-				{
-					Ease = AdfEaseType.OutCirc,
-					Scale = new(random.RandBetween(100, 300)),
+                chart.ChartTiles[start + 28].TileEvents.Add(new AdfEventMoveDecorations()
+                {
+                    Duration = 0d,
+                    Opacity = 100d,
+                    Tag = $"quartrond-random-starting-${start}-circle-{gid}"
+                });
+                chart.ChartTiles[start + 28].TileEvents.Add(new AdfEventMoveDecorations()
+                {
+                    Ease = AdfEaseType.OutCirc,
+                    Scale = new(random.RandBetween(100, 300)),
                     RelativeTo = AdfMoveDecorationRelativeToType.LastPosition,
-					Duration = 4d,
-					Tag = $"quartrond-random-starting-${start}-circle-{gid}",
+                    Duration = 4d,
+                    Tag = $"quartrond-random-starting-${start}-circle-{gid}",
                     AngleOffset = random.RandBetween(0, 180),
-				});
-			}
+                });
+            }
 
             chart.ChartTiles[end + 1].TileEvents.Add(new AdfEventMoveDecorations()
             {
@@ -612,8 +1114,8 @@ namespace MagicShaper.VfxProjects
 
 
         private static void Verse(AdfChart chart)
-            {
-                chart.ModernTrackAppear(77, 120, 4d, 4d, -2, 2, -4, -2, -45, 45, 25, 50, 60, 200, 100, 0.8);
+        {
+            chart.ModernTrackAppear(77, 120, 4d, 4d, -2, 2, -4, -2, -45, 45, 25, 50, 60, 200, 100, 0.8);
             chart.ModernTrackDisappear(76, 120, 4d, -4d, -2, 2, -4, -2, -45, 45, 25, 50, 60, 0.8);
 
             foreach (var tile in Enumerable.Range(120, 221 - 120).Where(i => !chart.ChartTiles[i].TileEvents.Any(e => e is AdfEventEditorComment)))
@@ -734,8 +1236,8 @@ namespace MagicShaper.VfxProjects
                 Mat mat = Cv2.ImRead(chart.FileLocation?.Parent?.FullName + $"\\larping-{i + 1}.png");
                 double defaultCameraZoom = 250;
 
-                double widthMultiplier = (double) ExtensionSharedConstants.CanvasWidth / mat.Width * defaultCameraZoom / 100d;
-                double heightMultiplier = (double) ExtensionSharedConstants.CanvasHeight / mat.Height  * defaultCameraZoom / 100d;
+                double widthMultiplier = (double)ExtensionSharedConstants.CanvasWidth / mat.Width * defaultCameraZoom / 100d;
+                double heightMultiplier = (double)ExtensionSharedConstants.CanvasHeight / mat.Height * defaultCameraZoom / 100d;
 
                 double scale = 100d * Math.Max(widthMultiplier, heightMultiplier);
 
@@ -760,7 +1262,8 @@ namespace MagicShaper.VfxProjects
 
             List<int> switchTiles = [start - 1];
             var flashIndex = 0;
-            for (int i = start; i < end; i++) {
+            for (int i = start; i < end; i++)
+            {
                 if (!chart.ChartTiles[i].TileEvents.Any(e => e is AdfEventMoveCamera)) continue;
 
                 switchTiles.Add(i);
@@ -829,49 +1332,49 @@ namespace MagicShaper.VfxProjects
 
             chart.ModernTrackAppear(end, end + 9, 4d, 4d, -0.5, 0.5, -1.5, -0.5, -20, 02, 80, 95, 45, 300, 100);
 
-			//Random random = new();
-			//for (int i = start; i < end; i++)
-			//{
-   //             if (chart.ChartTiles[i].TargetAngle == 999d) continue;
+            //Random random = new();
+            //for (int i = start; i < end; i++)
+            //{
+            //             if (chart.ChartTiles[i].TargetAngle == 999d) continue;
 
-   //             var gid = random.Next(1000000).ToString().PadLeft(6, '0');
-			//	chart.AddDecorationToChart(new()
-			//	{
-			//		DecorationImage = "circle.png",
-			//		Opacity = 0d,
-			//		Tag = $"quartrond-random-circle-starting-${start} quartrond-random-circle-starting-${start}-{gid}",
-			//		RelativeTo = AdfMoveDecorationRelativeToType.Tile,
-			//		Position = new(0, 0),
-			//		Floor = i,
-			//		Depth = 5,
-			//		BlendMode = AdfBlendMode.Difference,
-			//		Scale = new(0)
-			//	});
+            //             var gid = random.Next(1000000).ToString().PadLeft(6, '0');
+            //	chart.AddDecorationToChart(new()
+            //	{
+            //		DecorationImage = "circle.png",
+            //		Opacity = 0d,
+            //		Tag = $"quartrond-random-circle-starting-${start} quartrond-random-circle-starting-${start}-{gid}",
+            //		RelativeTo = AdfMoveDecorationRelativeToType.Tile,
+            //		Position = new(0, 0),
+            //		Floor = i,
+            //		Depth = 5,
+            //		BlendMode = AdfBlendMode.Difference,
+            //		Scale = new(0)
+            //	});
 
-			//	chart.ChartTiles[i].TileEvents.Add(new AdfEventMoveDecorations()
-			//	{
-			//		Duration = 0d,
-			//		Opacity = 100d,
-			//		Tag = $"quartrond-random-circle-starting-${start}-{gid}"
-			//	});
-			//	chart.ChartTiles[i].TileEvents.Add(new AdfEventMoveDecorations()
-			//	{
-			//		Ease = AdfEaseType.OutCirc,
-			//		Scale = new(random.RandBetween(30, 100)),
-   //                 RelativeTo = AdfMoveDecorationRelativeToType.LastPosition,
-			//		PositionOffset = new(random.RandBetween(-1, 1), random.RandBetween(-2, 2)),
-			//		Duration = 1d,
-			//		Tag = $"quartrond-random-circle-starting-${start}-{gid}"
-			//	});
-			//}
+            //	chart.ChartTiles[i].TileEvents.Add(new AdfEventMoveDecorations()
+            //	{
+            //		Duration = 0d,
+            //		Opacity = 100d,
+            //		Tag = $"quartrond-random-circle-starting-${start}-{gid}"
+            //	});
+            //	chart.ChartTiles[i].TileEvents.Add(new AdfEventMoveDecorations()
+            //	{
+            //		Ease = AdfEaseType.OutCirc,
+            //		Scale = new(random.RandBetween(30, 100)),
+            //                 RelativeTo = AdfMoveDecorationRelativeToType.LastPosition,
+            //		PositionOffset = new(random.RandBetween(-1, 1), random.RandBetween(-2, 2)),
+            //		Duration = 1d,
+            //		Tag = $"quartrond-random-circle-starting-${start}-{gid}"
+            //	});
+            //}
 
-   //         chart.ChartTiles[end + 8].TileEvents.Add(new AdfEventMoveDecorations()
-   //         {
-   //             Visible = false,
-   //             Opacity = 0,
-   //             Tag = $"quartrond-random-circle-starting-${start}",
-   //             Duration = 0,
-   //         });
+            //         chart.ChartTiles[end + 8].TileEvents.Add(new AdfEventMoveDecorations()
+            //         {
+            //             Visible = false,
+            //             Opacity = 0,
+            //             Tag = $"quartrond-random-circle-starting-${start}",
+            //             Duration = 0,
+            //         });
         }
 
 
@@ -882,7 +1385,7 @@ namespace MagicShaper.VfxProjects
 
         private static void TrackSpiralPart(AdfChart chart)
         {
-			Random random = new();
+            Random random = new();
             for (int i = 0; i < 32; i++)
             {
                 chart.ChartTiles[594 + (4 * i)].TileEvents.Add(new AdfEventScaleRadius() { Scale = 400 - ((400 - 100) / 31d * i) });
@@ -1037,7 +1540,45 @@ namespace MagicShaper.VfxProjects
                 });
             }
         }
+        #endregion GENERIC_EFFECT
 
         private static AdfPosition PositionFromPolar(double radius, double angleDegrees) => new(radius * Math.Cos(angleDegrees / 180d * Math.PI), radius * Math.Sin(angleDegrees / 180d * Math.PI));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        private static void RenderCharacter(AdfChart chart, char ch)
+        {
+            var byteString = $"{Convert.ToUInt16(ch):X2}";
+
+            if (!File.Exists(chart.FileLocation?.Parent?.FullName + $"\\quartrond_lyric_{byteString}.png"))
+            {
+                Image image = new Bitmap(256, 256);
+
+                Font font = new("Microsoft Yahei UI", 120f, FontStyle.Bold);
+                Graphics graphics = Graphics.FromImage(image);
+
+                graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+                graphics.DrawString(ch.ToString(),
+                                    font,
+                                    new SolidBrush(Color.FromArgb(255, 255, 255, 255)),
+                                    new PointF(256 / 2f, (256 - 210) / 2f),
+                                    new StringFormat() { Alignment = StringAlignment.Center });
+
+
+                image.Save(chart.FileLocation?.Parent?.FullName + $"\\quartrond_lyric_{byteString}.png");
+            }
+        }
     }
 }
